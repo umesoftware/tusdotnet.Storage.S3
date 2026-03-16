@@ -289,17 +289,20 @@ internal class TusS3Api
 
         await foreach (ListObjectsV2Response? response in paginator.Responses.WithCancellation(cancellationToken))
         {
-            foreach (S3Object s3Object in response.S3Objects)
+            if (response.S3Objects != null)
             {
-                string fileId = s3Object.Key.Split("/").Last().Trim();
+                foreach (S3Object s3Object in response.S3Objects)
+                {
+                    string fileId = s3Object.Key.Split("/").Last().Trim();
 
-                try
-                {
-                    uploadInfos.Add(await GetUploadInfo(fileId, cancellationToken));
-                }
-                catch (Exception)
-                {
-                    // ignored
+                    try
+                    {
+                        uploadInfos.Add(await GetUploadInfo(fileId, cancellationToken));
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
                 }
             }
         }
